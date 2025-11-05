@@ -23,6 +23,11 @@ class PropertyServiceProvider extends ServiceProvider
         $this->app->singleton(PropertyDescriptionService::class, function ($app) {
             return new PropertyDescriptionService();
         });
+
+        // Bind DescriptionScoringService as a singleton
+        $this->app->singleton(DescriptionScoringService::class, function ($app) {
+            return new DescriptionScoringService();
+        });
     }
 
     /**

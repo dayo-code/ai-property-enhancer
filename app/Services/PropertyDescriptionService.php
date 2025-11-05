@@ -2,8 +2,7 @@
 
 namespace App\Services;
 
-//use OpenAI\Laravel\Facades\OpenAI;
-use OpenAI;
+use OpenAI\Laravel\Facades\OpenAI;
 use Illuminate\Support\Facades\Log;
 use Exception;
 
@@ -17,12 +16,6 @@ class PropertyDescriptionService
 {
     private const MAX_RETRIES = 3;
     private const TIMEOUT = 30;
-    protected $aiClient;
-
-    public function __construct(){
-        $apiKey = config('services.openai.api_key');
-        $this->aiClient = OpenAI::client($apiKey);
-    }
 
     /**
      * Generates a property description using OpenAI
@@ -110,7 +103,7 @@ class PropertyDescriptionService
     private function callOpenAI(string $prompt, int $attempt = 1): string
     {
         try {
-            $response = $this->aiClient->chat()->create([
+            $response = OpenAI::chat()->create([
                 'model' => 'gpt-4o-mini', // Cost-effective and fast
                 'messages' => [
                     [

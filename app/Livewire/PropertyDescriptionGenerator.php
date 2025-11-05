@@ -205,18 +205,14 @@ class PropertyDescriptionGenerator extends Component
         try {
             $history = PropertyDescription::findOrFail($id);
 
-            // Load property data
             $this->title = $history->title;
             $this->propertyType = $history->property_type;
             $this->location = $history->location;
             $this->price = (string) $history->price;
             $this->keyFeatures = $history->key_features;
             $this->tone = $history->tone;
-
-            // Load generated content
             $this->generatedDescription = $history->generated_description;
 
-            // Load scores
             $this->scores = [
                 'readability_score' => $history->readability_score,
                 'seo_score' => $history->seo_score,
@@ -233,7 +229,6 @@ class PropertyDescriptionGenerator extends Component
             $this->loadedHistoryId = $id;
 
             session()->flash('success', 'Loaded from history!');
-
         } catch (Exception $e) {
             $this->addError('history', 'Failed to load from history');
         }

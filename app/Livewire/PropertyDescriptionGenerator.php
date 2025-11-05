@@ -2,8 +2,10 @@
 
 namespace App\Livewire;
 
+use App\Services\PropertyDescriptionService;
 use Livewire\Component;
 use Livewire\Attributes\Validate;
+use Exception;
 
 class PropertyDescriptionGenerator extends Component
 {
@@ -22,8 +24,25 @@ class PropertyDescriptionGenerator extends Component
     #[Validate('required|string|min:10')]
     public string $keyFeatures = '';
 
+    #[Validate('required|in:formal,casual')]
+    public string $tone = 'formal';
+
     public ?string $generatedDescription = null;
     public bool $isGenerating = false;
+    public int $generationCount = 0;
+
+    /**
+     * Property Description Service
+     */
+    private PropertyDescriptionService $descriptionService;
+
+    /**
+     * Boot the component with dependency injection
+     */
+    public function boot(PropertyDescriptionService $descriptionService): void
+    {
+        $this->descriptionService = $descriptionService;
+    }
 
     /**
      * Available property types
@@ -39,6 +58,17 @@ class PropertyDescriptionGenerator extends Component
     }
 
     /**
+     * Available tone options
+     */
+    public function getTonesProperty(): array
+    {
+        return [
+            'formal' => 'Professional & Formal',
+            'casual' => 'Friendly & Casual',
+        ];
+    }
+
+    /**
      * Generate AI-powered property description
      */
     public function generateDescription(): void
@@ -48,18 +78,52 @@ class PropertyDescriptionGenerator extends Component
 
         // Set loading state
         $this->isGenerating = true;
+        $this->resetErrorBag();
 
         try {
-            // TODO: Implement AI generation service call (Day 2)
-            // For now, create a placeholder
-            $this->generatedDescription = $this->createPlaceholderDescription();
+            // Prepare property data
+            $propertyData = [
+                'title' => $this->title,
+                'type' => $this->propertyType,
+                'location' => $this->location,
+                'price' => $this->price,
+                'features' => $this->keyFeatures,
+            ];
 
-            // Dispatch success event
-            $this->dispatch('description-generated');
+            // Validate data structure
+            if (!$this->descriptionService->validatePropertyData($propertyData)) {
+                throw new Exception('Invalid property data provided');
+            }
 
-        } catch (\Exception $e) {
-            // Handle errors gracefully
-            $this->addError('generation', 'Failed to generate description. Please try again.');
+            // Generate description using AI service
+            $this->generatedDescription = $this->descriptionService->generateDescription(
+                $propertyData,
+                $this->tone
+            );
+
+            // Increment generation counter
+            $this->generationCount++;
+
+            // Dispatch success event for potential frontend handling
+            $this->dispatch('description-generated', [
+                'count' => $this->generationCount
+            ]);
+
+            // Show success message
+            session()->flash('success', 'Description generated successfully!');
+
+        } catch (Exception $e) {
+            // Log error for debugging
+            logger()->error('Description generation failed', [
+                'error' => $e->getMessage(),
+                'property' => $this->title,
+            ]);
+
+            // Show user-friendly error message
+            $this->addError('generation', $e->getMessage());
+
+            // Reset description on error
+            $this->generatedDescription = null;
 
         } finally {
             $this->isGenerating = false;
@@ -87,20 +151,25 @@ class PropertyDescriptionGenerator extends Component
             'location',
             'price',
             'keyFeatures',
-            'generatedDescription'
+            'tone',
+            'generatedDescription',
+            'generationCount'
         ]);
         $this->resetValidation();
+        $this->resetErrorBag();
+
+        session()->forget('success');
     }
 
     /**
-     * Placeholder description (to be replaced with AI in Day 2)
+     * Update tone and regenerate if description exists
      */
-    private function createPlaceholderDescription(): string
+    public function updatedTone(): void
     {
-        return "Beautiful {$this->propertyType} located in {$this->location}. "
-            . "This stunning property is priced at ₦" . number_format((float)$this->price) . ". "
-            . "Key features include: {$this->keyFeatures}. "
-            . "Perfect for discerning buyers looking for quality and comfort.";
+        // If a description already exists, regenerate with new tone
+        if ($this->generatedDescription && !$this->isGenerating) {
+            $this->generateDescription();
+        }
     }
 
     public function render()

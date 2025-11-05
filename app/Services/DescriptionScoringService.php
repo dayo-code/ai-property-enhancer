@@ -292,11 +292,14 @@ class DescriptionScoringService
      */
     public function getScoreColor(int $score): string
     {
-        return match(true) {
-            $score >= 80 => 'green',
-            $score >= 60 => 'blue',
-            $score >= 40 => 'yellow',
-            default => 'red',
-        };
+        if ($score >= 80) {
+            return 'green';
+        } elseif ($score >= 60) {
+            return 'blue';
+        } elseif ($score >= 40) {
+            return 'yellow';
+        } else {
+            return 'red';
+        }
     }
 }

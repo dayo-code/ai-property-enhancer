@@ -4,9 +4,6 @@ namespace App\Services;
 
 /**
  * Service for calculating quality metrics for property descriptions
- *
- * Provides readability scores, SEO analysis, and various text metrics
- * to help users understand the quality of generated descriptions.
  */
 class DescriptionScoringService
 {
@@ -22,7 +19,7 @@ class DescriptionScoringService
         $readabilityScore = $this->calculateReadabilityScore($description);
         $seoScore = $this->calculateSeoScore($description, $propertyData);
 
-        // Overall score is weighted average
+        // Overall score is the weighted average
         $overallScore = (int) round(($readabilityScore * 0.4) + ($seoScore * 0.6));
 
         return [

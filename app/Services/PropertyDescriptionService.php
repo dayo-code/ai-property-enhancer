@@ -2,9 +2,10 @@
 
 namespace App\Services;
 
-use OpenAI\Laravel\Facades\OpenAI;
-use Illuminate\Support\Facades\Log;
 use Exception;
+use OpenAI\Laravel\Facades\OpenAI;
+use App\Models\PropertyDescription;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Service responsible for generating AI-powered property descriptions
@@ -44,34 +45,58 @@ class PropertyDescriptionService
      */
     private function buildPrompt(array $propertyData, string $tone): string
     {
+        // Fetch last few generated descriptions
+        $previousDescriptions = PropertyDescription::latest()
+            ->take(2)
+            ->pluck('generated_description')
+            ->implode("\n\n---\n\n");
+
         $toneInstructions = $this->getToneInstructions($tone);
         $formattedPrice = '₦' . number_format((float)$propertyData['price']);
 
         return <<<PROMPT
-            You are a professional real estate copywriter specializing in Nigerian property listings.
-            Create a compelling, SEO-optimized property description based on the following details:
+            You are a top-tier Nigerian real estate copywriter who deeply understands the Nigerian property market, urban lifestyle, and buyer psychology across different cities and states.
 
-            Property Title: {$propertyData['title']}
-            Property Type: {$propertyData['type']}
-            Location: {$propertyData['location']}
-            Price: {$formattedPrice}
-            Key Features: {$propertyData['features']}
+            Your task is to write a captivating, SEO-friendly property description using the details below.
+
+            Below are examples of previously generated descriptions.
+            Each time you generate, make it sound naturally different — vary your structure, phrasing, and focus points even if the same data is used.
+
+            Previous examples:
+            {$previousDescriptions}
+
+            Property Details:
+            - Title: {$propertyData['title']}
+            - Type: {$propertyData['type']}
+            - Location: {$propertyData['location']}
+            - Price: {$formattedPrice}
+            - Key Features: {$propertyData['features']}
 
             Tone: {$toneInstructions}
 
-            Requirements:
-            1. Write a natural, engaging description (150-250 words)
-            2. Highlight the property's unique selling points
-            3. Include location benefits and nearby amenities when relevant
-            4. Use persuasive but honest language
-            5. Incorporate SEO-friendly keywords naturally (e.g., "{$propertyData['type']} in {$propertyData['location']}")
-            6. End with a compelling call-to-action
-            7. Use Nigerian English and context
-            8. Do not use generic phrases like "don't miss out" or "once in a lifetime"
-            9. Focus on lifestyle benefits and practical advantages
+            Context Rules:
+            1. Adapt your writing to the local reality of the given location:
+            - **Lagos:** Mention lifestyle appeal (island living, proximity to Lekki, Victoria Island, Ikoyi, or mainland convenience), security, road networks, traffic access, and neighbourhood prestige.
+            - **Abuja:** Highlight serenity, modern infrastructure, government presence, accessibility, and quiet residential appeal (e.g., Gwarinpa, Wuse, Maitama, Lokogoma, Lugbe).
+            - **Port Harcourt:** Emphasize investment potential, oil city lifestyle, good roads, safety, and peaceful environment.
+            - **Ibadan or other South-West cities:** Focus on affordability, space, family comfort, and steady development.
+            - **Other cities:** Use realistic Nigerian context — infrastructure, electricity stability, access to transport, schools, markets, and job centres.
 
-            Write ONLY the property description. Do not include labels, titles, or meta-commentary.
+            Writing Guidelines:
+            1. Keep it between 150–250 words.
+            2. Use authentic Nigerian English — smooth, engaging, and believable.
+            3. Present the property’s strongest features with storytelling and lifestyle context — space, comfort, modern design, and quality finishing.
+            4. Include benefits of the area — nearby landmarks, schools, malls, places of worship, major roads, or business hubs.
+            5. Use SEO keywords naturally (e.g., "{$propertyData['type']} for sale in {$propertyData['location']}").
+            6. Write persuasively but honestly — reflect real Nigerian property values and buyer needs.
+            7. Avoid generic clichés like “once in a lifetime” or “don’t miss out.”
+            8. Vary sentence structure, vocabulary, and rhythm across outputs to ensure uniqueness.
+            9. End with a confident, motivating call-to-action that fits Nigerian buyer behavior — e.g., *“Schedule an inspection today”*, *“Call now to book a viewing”*, or *“Secure this home before the price goes up.”*
+            10. Focus on lifestyle, comfort, and practicality — not just features, but how it feels to live or invest there.
+
+            Output ONLY the property description — no titles, meta notes, or commentary.
             PROMPT;
+
         }
 
     /**
@@ -108,7 +133,7 @@ class PropertyDescriptionService
                 'messages' => [
                     [
                         'role' => 'system',
-                        'content' => 'You are an expert real estate copywriter specializing in creating compelling, SEO-optimized property descriptions for the Nigerian market.'
+                        'content' => 'You are an expert Nigerian real estate copywriter. Write persuasive, SEO-optimized property descriptions in Nigerian English based on user-provided property data.'
                     ],
                     [
                         'role' => 'user',

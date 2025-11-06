@@ -61,38 +61,6 @@ class PropertyDescription extends Model
     }
 
     /**
-     * Scope to filter by property type
-     */
-    public function scopeByType(Builder $query, string $type): Builder
-    {
-        return $query->where('property_type', $type);
-    }
-
-    /**
-     * Scope to filter by tone
-     */
-    public function scopeByTone(Builder $query, string $tone): Builder
-    {
-        return $query->where('tone', $tone);
-    }
-
-    /**
-     * Scope to get high-scoring descriptions
-     */
-    public function scopeHighQuality(Builder $query, int $minScore = 70): Builder
-    {
-        return $query->where('overall_score', '>=', $minScore);
-    }
-
-    /**
-     * Get formatted price
-     */
-    public function getFormattedPriceAttribute(): string
-    {
-        return '₦' . number_format($this->price, 2);
-    }
-
-    /**
      * Get short description preview
      */
     public function getShortDescriptionAttribute(): string
@@ -108,18 +76,5 @@ class PropertyDescription extends Model
     public function getTimeAgoAttribute(): string
     {
         return $this->created_at->diffForHumans();
-    }
-
-    /**
-     * Get score badge color
-     */
-    public function getScoreBadgeColorAttribute(): string
-    {
-        return match(true) {
-            $this->overall_score >= 80 => 'green',
-            $this->overall_score >= 60 => 'blue',
-            $this->overall_score >= 40 => 'yellow',
-            default => 'red',
-        };
     }
 }

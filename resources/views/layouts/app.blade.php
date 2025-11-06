@@ -32,8 +32,8 @@
                         </svg>
                     </div>
                     <div>
-                        <h1 class="text-lg font-bold text-gray-900">Property Centre</h1>
-                        <p class="text-xs text-gray-500">Powered by AI</p>
+                        <h1 class="text-lg font-bold text-gray-900">Nigeria Property Centre</h1>
+                        {{-- <p class="text-xs text-gray-500">Powered by Nigeria </p> --}}
                     </div>
                 </div>
 

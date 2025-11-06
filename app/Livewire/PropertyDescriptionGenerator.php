@@ -21,7 +21,7 @@ class PropertyDescriptionGenerator extends Component
     #[Validate('required|string|max:255')]
     public string $location = '';
 
-    #[Validate('required|numeric|min:0')]
+    #[Validate('required|numeric|min:1')]
     public string $price = '';
 
     #[Validate('required|string|min:10')]
@@ -31,7 +31,6 @@ class PropertyDescriptionGenerator extends Component
     public string $tone = 'formal';
 
     public ?string $generatedDescription = null;
-    public bool $isGenerating = false;
     public int $generationCount = 0;
     public ?array $scores = null;
     public bool $showHistory = false;
@@ -89,7 +88,7 @@ class PropertyDescriptionGenerator extends Component
      */
     public function getHistoryProperty()
     {
-        return PropertyDescription::recent(20)->get();
+        return PropertyDescription::recent(10)->get();
     }
 
 
@@ -98,11 +97,7 @@ class PropertyDescriptionGenerator extends Component
      */
     public function generateDescription(): void
     {
-        // Validate form inputs
         $this->validate();
-
-        // Set loading state
-        $this->isGenerating = true;
         $this->resetErrorBag();
 
         try {
@@ -115,7 +110,6 @@ class PropertyDescriptionGenerator extends Component
                 'features' => $this->keyFeatures,
             ];
 
-            // Validate data structure
             if (!$this->descriptionService->validatePropertyData($propertyData)) {
                 throw new Exception('Invalid property data provided');
             }
@@ -132,23 +126,18 @@ class PropertyDescriptionGenerator extends Component
                 $propertyData
             );
 
-            // Save to history
             $this->saveToHistory($propertyData);
-
-            // Increment generation counter
             $this->generationCount++;
 
-            // Dispatch success event for potential frontend handling
+            // Dispatch success event for frontend handling
             $this->dispatch('description-generated', [
                 'count' => $this->generationCount,
                 'scores' => $this->scores
             ]);
 
-            // Show success message
             session()->flash('success', 'Description generated successfully!');
-
         } catch (Exception $e) {
-            // Log error for debugging
+
             logger()->error('Description generation failed', [
                 'error' => $e->getMessage(),
                 'property' => $this->title,
@@ -160,9 +149,6 @@ class PropertyDescriptionGenerator extends Component
             // Reset description on error
             $this->generatedDescription = null;
             $this->scores = null;
-
-        } finally {
-            $this->isGenerating = false;
         }
     }
 
@@ -315,7 +301,7 @@ class PropertyDescriptionGenerator extends Component
     public function updatedTone(): void
     {
         // If a description already exists, regenerate with new tone
-        if ($this->generatedDescription && !$this->isGenerating) {
+        if ($this->generatedDescription) {
             $this->loadedHistoryId = null; // Clear loaded flag
             $this->generateDescription();
         }

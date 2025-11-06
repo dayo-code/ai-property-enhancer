@@ -456,7 +456,7 @@
                                     })
                                     .catch(err => console.error('Copy failed', err));
                             }
-                        }">
+                        }" key="{{ md5($generatedDescription) }}">
                             <button type="button" @click="copyDescription"
                                 class="btn bg-green-600 text-white hover:bg-green-700 flex items-center gap-2">
                                 <!-- Copy icon -->
@@ -473,7 +473,6 @@
                                         d="M5 13l4 4L19 7" />
                                 </svg>
 
-                                <!-- Text -->
                                 <span x-text="copied ? 'Copied!' : 'Copy Description'"></span>
                             </button>
                         </div>

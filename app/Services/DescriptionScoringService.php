@@ -4,9 +4,6 @@ namespace App\Services;
 
 /**
  * Service for calculating quality metrics for property descriptions
- *
- * Provides readability scores, SEO analysis, and various text metrics
- * to help users understand the quality of generated descriptions.
  */
 class DescriptionScoringService
 {
@@ -22,7 +19,7 @@ class DescriptionScoringService
         $readabilityScore = $this->calculateReadabilityScore($description);
         $seoScore = $this->calculateSeoScore($description, $propertyData);
 
-        // Overall score is weighted average
+        // Overall score is the weighted average
         $overallScore = (int) round(($readabilityScore * 0.4) + ($seoScore * 0.6));
 
         return [
@@ -183,7 +180,9 @@ class DescriptionScoringService
     private function countSentences(string $text): int
     {
         // Count sentence-ending punctuation
-        $sentences = preg_split('/[.!?]+/', $text, -1, PREG_SPLIT_NO_EMPTY);
+        $parts = preg_split('/(?<=[.!?])\s+/u', $text, -1, PREG_SPLIT_NO_EMPTY);
+        $sentences = array_map('trim', $parts);
+
         return count($sentences);
     }
 
@@ -292,14 +291,11 @@ class DescriptionScoringService
      */
     public function getScoreColor(int $score): string
     {
-        if ($score >= 80) {
-            return 'green';
-        } elseif ($score >= 60) {
-            return 'blue';
-        } elseif ($score >= 40) {
-            return 'yellow';
-        } else {
-            return 'red';
-        }
+        return match(true) {
+            $score >= 80 => 'green',
+            $score >= 60 => 'blue',
+            $score >= 40 => 'yellow',
+            default => 'red',
+        };
     }
 }

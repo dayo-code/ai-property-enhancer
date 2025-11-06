@@ -7,9 +7,6 @@ use Illuminate\Support\ServiceProvider;
 
 /**
  * Service Provider for Property-related services
- *
- * Registers and binds services following SOLID principles,
- * specifically Dependency Inversion (depend on abstractions, not concretions).
  */
 class PropertyServiceProvider extends ServiceProvider
 {

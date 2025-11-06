@@ -143,7 +143,7 @@
                         </label>
                         <input type="text" id="title" wire:model="title"
                             class="input-field @error('title') border-red-500 @enderror"
-                            placeholder="Luxury 4-Bedroom Duplex">
+                            placeholder="e.g., Luxury 4-Bedroom Duplex">
                         @error('title')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -173,7 +173,7 @@
                         </label>
                         <input type="text" id="location" wire:model="location"
                             class="input-field @error('location') border-red-500 @enderror"
-                            placeholder="Durumi, Abuja">
+                            placeholder="e.g., Durumi, Abuja">
                         @error('location')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -185,7 +185,7 @@
                             Price (₦) <span class="text-red-500">*</span>
                         </label>
                         <input type="number" id="price" wire:model="price"
-                            class="input-field @error('price') border-red-500 @enderror" placeholder="50000000"
+                            class="input-field @error('price') border-red-500 @enderror" placeholder="e.g., 50000000"
                             min="0" step="100000">
                         @error('price')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -366,10 +366,10 @@
                                             {{ $scores['readability_score'] }}/100
                                         </span>
                                     </div>
-                                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    {{-- <div class="w-full bg-gray-200 rounded-full h-2.5">
                                         <div class="bg-{{ $this->scoringService->getScoreColor($scores['readability_score']) }}-600 h-2.5 rounded-full transition-all duration-500"
                                             style="width: {{ $scores['readability_score'] }}%"></div>
-                                    </div>
+                                    </div> --}}
                                     <p class="text-xs text-gray-500 mt-1">{{ $scores['readability_label'] }}</p>
                                 </div>
 
@@ -382,10 +382,10 @@
                                             {{ $scores['seo_score'] }}/100
                                         </span>
                                     </div>
-                                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    {{-- <div class="w-full bg-gray-200 rounded-full h-2.5">
                                         <div class="bg-{{ $this->scoringService->getScoreColor($scores['seo_score']) }}-600 h-2.5 rounded-full transition-all duration-500"
                                             style="width: {{ $scores['seo_score'] }}%"></div>
-                                    </div>
+                                    </div> --}}
                                     <p class="text-xs text-gray-500 mt-1">{{ $scores['seo_label'] }}</p>
                                 </div>
                             </div>
@@ -456,7 +456,7 @@
                                     })
                                     .catch(err => console.error('Copy failed', err));
                             }
-                        }">
+                        }" key="{{ md5($generatedDescription) }}">
                             <button type="button" @click="copyDescription"
                                 class="btn bg-green-600 text-white hover:bg-green-700 flex items-center gap-2">
                                 <!-- Copy icon -->
@@ -473,7 +473,6 @@
                                         d="M5 13l4 4L19 7" />
                                 </svg>
 
-                                <!-- Text -->
                                 <span x-text="copied ? 'Copied!' : 'Copy Description'"></span>
                             </button>
                         </div>

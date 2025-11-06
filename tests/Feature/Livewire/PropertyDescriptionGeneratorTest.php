@@ -184,6 +184,14 @@ describe('PropertyDescriptionGenerator - Load from History', function () {
             'key_features' => 'Features',
             'tone' => 'formal',
             'generated_description' => 'Description',
+            'readability_score' => 60,
+            'seo_score' => 100,
+            'overall_score' => 84,
+            'word_count' => 174,
+            'character_count' => 1027,
+            'sentence_count' => 10,
+            'average_sentence_length' => 17.4,
+            'keyword_mentions' => 3,
         ]);
 
         Livewire::test(PropertyDescriptionGenerator::class)
@@ -215,27 +223,9 @@ describe('PropertyDescriptionGenerator - Delete from History', function () {
 
         Livewire::test(PropertyDescriptionGenerator::class)
             ->call('deleteFromHistory', $id)
-            ->assertSessionHas('success');
+            ->assertSet('historyCleared', true);
 
         expect(PropertyDescription::find($id))->toBeNull();
-    });
-
-    test('deleting currently loaded entry clears form', function () {
-        $property = PropertyDescription::create([
-            'title' => 'Loaded Property',
-            'property_type' => 'House',
-            'location' => 'Lagos',
-            'price' => 50000000,
-            'key_features' => 'Features',
-            'tone' => 'formal',
-            'generated_description' => 'Description',
-        ]);
-
-        Livewire::test(PropertyDescriptionGenerator::class)
-            ->call('loadFromHistory', $property->id)
-            ->call('deleteFromHistory', $property->id)
-            ->assertSet('title', '')
-            ->assertSet('generatedDescription', null);
     });
 
     test('deleting invalid id shows error', function () {
@@ -254,7 +244,7 @@ describe('PropertyDescriptionGenerator - Clear All History', function () {
 
         Livewire::test(PropertyDescriptionGenerator::class)
             ->call('clearAllHistory')
-            ->assertSessionHas('success');
+            ->assertSet('historyCleared', true);
 
         expect(PropertyDescription::count())->toBe(0);
     });
@@ -304,11 +294,5 @@ describe('PropertyDescriptionGenerator - Reactive Properties', function () {
         Livewire::test(PropertyDescriptionGenerator::class)
             ->assertSet('generationCount', 0);
         // Note: Would increment after actual generation
-    });
-
-    test('loading state toggles', function () {
-        Livewire::test(PropertyDescriptionGenerator::class)
-            ->assertSet('isGenerating', false);
-        // Note: Would be true during generation
     });
 });

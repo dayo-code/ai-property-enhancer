@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class PropertyDescription extends Model
 {
@@ -39,14 +40,14 @@ class PropertyDescription extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'price' => 'decimal:2',
+        'price' => 'float',
         'readability_score' => 'integer',
         'seo_score' => 'integer',
         'overall_score' => 'integer',
         'word_count' => 'integer',
         'character_count' => 'integer',
         'sentence_count' => 'integer',
-        'average_sentence_length' => 'decimal:1',
+        'average_sentence_length' => 'float',
         'keyword_mentions' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
@@ -75,6 +76,8 @@ class PropertyDescription extends Model
      */
     public function getTimeAgoAttribute(): string
     {
-        return $this->created_at->diffForHumans();
+        return $this->created_at instanceof Carbon
+            ? $this->created_at->diffForHumans()
+            : Carbon::parse($this->created_at)->diffForHumans();
     }
 }

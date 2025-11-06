@@ -35,6 +35,7 @@ class PropertyDescriptionGenerator extends Component
     public ?array $scores = null;
     public bool $showHistory = false;
     public ?int $loadedHistoryId = null;
+    public bool $historyCleared = false;
 
     /**
      * Property Description Service
@@ -233,6 +234,7 @@ class PropertyDescriptionGenerator extends Component
                 $this->resetForm();
             }
 
+            $this->historyCleared = true;
             session()->flash('success', 'History entry deleted!');
 
         } catch (Exception $e) {
@@ -247,20 +249,12 @@ class PropertyDescriptionGenerator extends Component
     {
         try {
             PropertyDescription::truncate();
-
+            $this->historyCleared = true;
             session()->flash('success', 'All history cleared!');
 
         } catch (Exception $e) {
             $this->addError('history', 'Failed to clear history');
         }
-    }
-
-    /**
-     * Toggle history sidebar
-     */
-    public function toggleHistory(): void
-    {
-        $this->showHistory = !$this->showHistory;
     }
 
     /**

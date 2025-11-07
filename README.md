@@ -28,7 +28,7 @@ A production-ready Laravel 11 + Livewire 3 application that generates compelling
 - [Testing](#-testing)
 - [Architecture](#-architecture)
 - [API Integration](#-api-integration)
-- [Reflection](#-reflection)
+- [Reflection: How I Approached This Task](#-reflection-how-i-approached-this-task)
 - [Troubleshooting](#-troubleshooting)
 - [Performance](#-performance)
 - [License](#-license)

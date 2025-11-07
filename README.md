@@ -29,6 +29,9 @@ A production-ready Laravel 11 + Livewire 3 application that generates compelling
 - [Architecture](#-architecture)
 - [API Integration](#-api-integration)
 - [Reflection](#-reflection)
+- [Troubleshooting](#-troubleshooting)
+- [Performance](#-performance)
+- [License](#-license)
 
 ---
 
@@ -350,6 +353,8 @@ I started by splitting the project into clear phases: setting up the foundation,
 The toughest part was the scoring algorithms. For readability, I researched the Flesch Reading Ease formula and created a syllable counter using vowel group patterns, The SEO scoring was tricky because it has to balance things like length, keywords, and structure without feeling random, so I weighted each factor based on real SEO best practices and also used Claude AI as a coding partner to speed things up and explore solutions for the readability and SEO scoring. This shows how senior developement works today, using tools efficiently is just as important as strong coding ability.
 The service layer setup was intentional as it helped to separate OpenAI integration, scoring logic, and data storage, making everything easier to test and maintain. Livewire hooks also came in handy for regenerating content when switching tones.
 I wrote over 70 tests, which caught some edge cases early and really improved code quality and then using the factory pattern made generating test data super easy.
+
+---
 
 ## 🚨 Troubleshooting
 
